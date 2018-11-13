@@ -1,0 +1,30 @@
+<div id="messageDiv">
+
+</div>
+
+<input type="text" id="messageInput"/>
+<button id="submitMessage">Send</button>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io();
+
+    var messageDiv = document.getElementById('messageDiv')
+    var messageInput = document.getElementById('messageInput')
+    var submitBtn = document.getElementById('submitMessage')
+
+    submitBtn.addEventListener('click', ()=> {
+        socket.emit('add-message', {'text':messageInput.value, from: 'visiteur', created: new Date()})
+        console.log(messageInput.value)
+        messageDiv.innerHTML += '<p>'+messageInput.value+'</p>'
+        messageInput.value = '';
+    })
+    socket.on('message', data => {
+        console.log('message received : ', data)
+        messageDiv.innerHTML += '<p>'+messageInput.value+'</p>'
+    })
+    socket.emit('loaded', 'page loaded !!')
+
+    window.onbeforeunload = function() {
+        socket.emit('disconnect')
+    }
+</script>
